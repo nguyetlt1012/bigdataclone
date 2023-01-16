@@ -12,7 +12,7 @@
 >hdfs dfsadmin -safemode leave
 >
 >exit
-4. Add hostname to etc/hosts
+4. Add hostname to C:\Windows\System32\drivers\etc\hosts.txt
 > 127.0.0.1 datanode-1
 5. Add folder logs in folder consumer, producer
 ## Run 
