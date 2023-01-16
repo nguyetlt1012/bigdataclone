@@ -9,18 +9,18 @@ import os
 class CoinProducer:
     def __init__(self):
         log_handler = RotatingFileHandler(
-            f"{os.path.abspath(os.getcwd())}/kafka/coin_producer/logs/producer.log",
+            f"{os.path.abspath(os.getcwd())}/kafka/producer/logs/producer.log",
             maxBytes=104857600, backupCount=10)
         logging.basicConfig(
             format='%(asctime)s,%(msecs)d <%(name)s>[%(levelname)s]: %(message)s',
             datefmt='%H:%M:%S',
             level=logging.DEBUG,
             handlers=[log_handler])
-        self.logger = logging.getLogger('coin_producer')
+        self.logger = logging.getLogger('producer')
 
         self.producer = KafkaProducer(
             bootstrap_servers=['localhost:19092', 'localhost:29092', 'localhost:39092'],
-            client_id='coin_producer')
+            client_id='producer')
 
     def message_handler(self, message):
         #  Message from binnance sapi
@@ -49,7 +49,7 @@ class CoinProducer:
             ws_client.stop()
 
     def run(self):
-        with open(os.path.abspath(os.getcwd()) + "/kafka/coin_producer/symbol_list.csv") as f:
+        with open(os.path.abspath(os.getcwd()) + "/kafka/producer/symbol_list.csv") as f:
             symbol_list = f.read().split('\n')
         self.crawl_from_binance(symbol_list[:5])
         # crawling_processes = [

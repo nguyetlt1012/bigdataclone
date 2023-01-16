@@ -10,14 +10,14 @@ from hdfs import InsecureClient
 class CoinConsumer:
     def __init__(self):
         log_handler = RotatingFileHandler(
-            f"{os.path.abspath(os.getcwd())}/kafka/coin_consumer/logs/consumer.log",
+            f"{os.path.abspath(os.getcwd())}/kafka/consumer/logs/consumer.log",
             maxBytes=104857600, backupCount=10)
         logging.basicConfig(
             format='%(asctime)s,%(msecs)d <%(name)s>[%(levelname)s]: %(message)s',
             datefmt='%H:%M:%S',
             level=logging.DEBUG,
             handlers=[log_handler])
-        self.logger = logging.getLogger('coin_consumer')
+        self.logger = logging.getLogger('consumer')
         self.consumer = KafkaConsumer(
             'coinTradeData',
             bootstrap_servers=['localhost:19092', 'localhost:29092', 'localhost:39092'],
