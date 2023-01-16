@@ -33,7 +33,6 @@ class CoinConsumer:
             str(current_time.month) + "/" +\
             str(current_time.day) + "/"\
             f"coinTradeData.{int(round(current_time.timestamp()))}"
-
         self.logger.info(
             f"Starting flush file {tmp_file_name} to hdfs")
         flush_status = self.hdfs_client.upload(hdfs_filename, tmp_file_name)
@@ -44,7 +43,7 @@ class CoinConsumer:
         self.consumer.commit()
 
     def recreate_tmpfile(self):
-        tmp_file = tempfile.NamedTemporaryFile(mode='w+t')
+        tmp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         tmp_file.write('Symbol,Price,Quantity,Trade time\n')
         return tmp_file
 
@@ -61,9 +60,11 @@ class CoinConsumer:
                     for message in messages:
                         true_msg = str(message[6])[2: len(str(message[6])) - 1]
                         tmp_file.write(f"{true_msg}\n")
-
-                # File size > 10mb flush to hdfs
-                if tmp_file.tell() > 10485760:
+                        print(true_msg)
+                # File size > 10mb flush to hdfs  max = 10485760 
+                
+                if tmp_file.tell() > 100:
+                    print("xooo")
                     self.flush_to_hdfs(tmp_file.name)
                     tmp_file.close()
                     tmp_file = self.recreate_tmpfile()
