@@ -17,7 +17,10 @@
 5. Add folder logs in folder consumer, producer
 ## Run 
 1. Run file producer
+>
 > for /f %i in ('python -m certifi') do set SSL_CERT_FILE=%i
-> python kafka/producer/app.py
+> 
+>python kafka/producer/app.py
+>
 2. Run file consumer
 > python kafka/consumer/app.py
