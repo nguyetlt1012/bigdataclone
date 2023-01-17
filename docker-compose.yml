@@ -164,8 +164,42 @@ services:
     - ../storage/hadoop/datanode-1:/hadoop/dfs/data
     networks:
       - es-net
-
-
+  datanode-2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode-2
+    hostname: datanode-2
+    ports:
+      - 50075:9864
+    environment:
+      - SERVICE_PRECONDITION=namenode:9870
+    env_file:
+      - ./hadoop/hadoop.env
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+    volumes:
+    - ../storage/hadoop/datanode-2:/hadoop/dfs/data
+    networks:
+      - es-net
+  datanode-3:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode-3
+    hostname: datanode-3
+    ports:
+      - 50175:9864
+    environment:
+      - SERVICE_PRECONDITION=namenode:9870
+    env_file:
+      - ./hadoop/hadoop.env
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+    volumes:
+    - ../storage/hadoop/datanode-3:/hadoop/dfs/data
+    networks:
+      - es-net
   resourcemanager:
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
@@ -173,7 +207,7 @@ services:
     ports:
       - 8088:8088
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 datanode-3:9864"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
@@ -196,7 +230,7 @@ services:
     ports:
       - 8042:8042
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 datanode-3:9864 resourcemanager:8088"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
@@ -211,7 +245,7 @@ services:
     container_name: historyserver
     hostname: historyserver
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 datanode-3:9864 resourcemanager:8088"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
