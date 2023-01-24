@@ -14,12 +14,13 @@ os.environ['YARN_CONF_DIR'] = os.path.abspath(os.getcwd()) + '/spark/conf'
 
 class CoinTradeDataTransformer():
     def __init__(self):
+        print(os.environ['YARN_CONF_DIR'])
         self.spark = SparkSession.builder\
             .config("spark.app.name", "CoinTradeDataAnalyzer")\
             .config("spark.master", "yarn")\
             .config("spark.jars.packages", "com.datastax.spark:spark-cassandra-connector_2.12:3.2.0")\
             .config("spark.sql.extensions", "com.datastax.spark.connector.CassandraSparkExtensions")\
-            .config("spark.cassandra.connection.host", "172.20.0.15")\
+            .config("spark.cassandra.connection.host", "172.18.0.10")\
             .config("spark.cassandra.auth.username", "cassandra")\
             .config("spark.cassandra.auth.password", "cassandra")\
             .getOrCreate()
@@ -27,7 +28,16 @@ class CoinTradeDataTransformer():
         #  .config("spark.driver.memory", "2g")\
         #  .config("spark.executor.memory", "2g")\
         #  .config("spark.executor.instances", "2")\
-        self.frequency = ['minute', 'hour', 'day', 'week', 'month', 'year']
+        # os.environ['HADOOP_CONF_DIR'] = os.path.abspath(os.getcwd()) + '/spark/conf'
+        # os.environ['YARN_CONF_DIR'] = os.path.abspath(os.getcwd()) + '/spark/conf'
+        # self.frequency = ['minute', 'hour', 'day', 'week', 'month', 'year']
+        # self.spark = SparkSession.builder.appName('Lottery Data Analysis').master('local').getOrCreate()
+        # sc = self.spark.sparkContext
+        # sc.setLogLevel('ERROR')
+        print("endd")
+        # # In thông tin về spark
+        # print('- ' * 10, '  SPARK  ', '- ' * 10)
+        # print('Spark Context -> Master: {} - App Name: {}'.format(sc.master, sc.appName))
 
     def map_time(self, df, frequency):
         return df.withColumn('Trade time', date_trunc(
@@ -53,6 +63,7 @@ class CoinTradeDataTransformer():
             .option('header', True)\
             .option('inferSchema', True)\
             .load(files)
+        print("df", df)
         frequency_dfs = {f: self.map_time(df, f) for f in self.frequency}
         frequency_dfs = {f: self.analyze_statistics(df, f) for f, df in frequency_dfs.items()}
         # This only work because I'm in a hurry. If database to big it will explode
@@ -88,9 +99,9 @@ class CoinTradeDataAnalyzer():
         self.hdfs_client = InsecureClient('http://localhost:9870', user='root')
         self.current_date = datetime(*[int(v) for v in current_date.split('/')]).timestamp()
         self.latest_file_time = latest_file_time
-
     def transform_and_save_data(self, files):
         self.logger.info('Start transforming data')
+        print(files)
         frequency_df = self.transformer.transform_data(files)
         frequency_df.write.format('org.apache.spark.sql.cassandra')\
                           .mode('append')\

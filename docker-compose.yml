@@ -132,6 +132,7 @@ services:
     hostname: namenode
     ports:
       - 9870:9870
+      - 9000:9000
     environment:
       - CLUSTER_NAME=coin_hub
     env_file:
@@ -172,8 +173,9 @@ services:
     hostname: resourcemanager
     ports:
       - 8088:8088
+      - 8032:8032
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
@@ -196,7 +198,7 @@ services:
     ports:
       - 8042:8042
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 resourcemanager:8088"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
@@ -210,8 +212,10 @@ services:
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
     hostname: historyserver
+    ports:
+      - 8188:8188
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 datanode-2:9864 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode-1:9864 resourcemanager:8088"
     env_file:
       - ./hadoop/hadoop.env
     deploy:
@@ -224,7 +228,18 @@ services:
       - ../storage/hadoop/hadoop_historyserver:/hadoop/yarn/timeline
     networks:
       - es-net
-
+  cassandra:
+    image: cassandra:4.0.5
+    container_name: cassandra
+    hostname: cassandra
+    env_file:
+      - ./cassandra/cassandra.env
+    ports:
+      - 9042:9042
+    volumes:
+      - ../storage/cassandra:/var/lib/cassandra
+    networks:
+      - es-net
 
 networks:
   es-net:
